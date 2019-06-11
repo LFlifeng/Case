@@ -1,0 +1,1044 @@
+/*** 选择地区fn start ***/
+var selectAreaArr = []; // 已选中的地区
+var selectAreaObj = {
+  //根据后台返回的地区id，选中相应的地区
+  show_selected_area: function (arr) {
+	  $('#selectRight').html('');
+    if (arr == '') {
+      arr = "2703";
+    }
+    selectAreaArr = arr.split(",");
+    if (selectAreaArr.length != 0) {
+
+      if (this.in_array(2703, selectAreaArr)) {
+        // 如果是全国
+        $('#checkbox-qg')[0].checked = true;
+        var selected_btn = '<span class="select-button select-btn-' + allArr['qg'][0].id + '" onclick="selectAreaObj.reset_area()"><a>全国 ×</a></span>';
+        $('#selectRight').prepend(selected_btn);
+        for (var i in allArr) {
+          // 此时area = qg
+          if (i != 'qg') {
+            // 1.全国下面的地区全选中
+            $('#checkbox-' + i)[0].checked = true;
+            $('#checkbox-' + i)[0].disabled = true;
+            for (var j in allArr[i]) {
+              if (!this.in_array(allArr[i][j].id, selectAreaArr)) {
+                if (typeof $('#checkbox-' + allArr[i][j].id)[0] != 'undefined') {
+                  // 地区对应的所有省选中
+                  $('#checkbox-' + allArr[i][j].id)[0].checked = true;
+                  $('#checkbox-' + allArr[i][j].id)[0].disabled = true;
+                }
+                for (var k = 1; k < allArr[i][j].hasCity.length; k++) {
+                  if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+                    // 如果展开时，省选中了，该省下面的市取消选中
+                    //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].checked = true;
+                    //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].disabled = true;
+                    this.del(i, allArr[i][j].hasCity[k].id);
+                  }
+                }
+              }
+              $('#checkbox-' + i)[0].checked = true;
+              $('#checkbox-' + i)[0].disabled = true;
+            }
+          }
+        }
+      } else {
+        for (var i in allArr) {
+          // 此时area = qg
+          if (i != 'qg') {
+            var all_pro_checked_num = 0;
+            for (var j in allArr[i]) {
+              for (var n in selectAreaArr) {
+                if (selectAreaArr[n] == allArr[i][j].id) {
+                  all_pro_checked_num++;
+                  if (typeof $('#checkbox-' + allArr[i][j].id)[0] != 'undefined') {
+                    // 地区对应的所有省选中
+                    $('#checkbox-' + allArr[i][j].id)[0].checked = true;
+                    $('#checkbox-' + allArr[i][j].id)[0].disabled = false;
+                  }
+                  var selected_btn = '<span class="select-button select-btn-' + allArr[i][j].id + '" data-area="' + i + '" onclick="selectAreaObj.del(\'' + i + '\', ' + allArr[i][j].id + ')"><a>' + allArr[i][j].areaName + ' ×</a></span>';
+                  $('#selectRight').prepend(selected_btn);
+                }
+              }
+              if (all_pro_checked_num == allArr[i].length) {
+                // 如果该地区下的省全部都选了，就选中该地区
+                $('#checkbox-' + i)[0].checked = true;
+                // 判断地区是否全部选中
+                this.listen_counarea_num();
+              } else {
+                $('#checkbox-' + i)[0].checked = false;
+              }
+
+              for (var k = 1; k < allArr[i][j].hasCity.length; k++) {
+                if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+                  // 如果展开时，省选中了，该省下面的市取消选中
+                  var selected_btn = '<span class="select-button select-btn-' + allArr[i][j].hasCity[k].id + '" data-area="' + i + '" onclick="selectAreaObj.del(\'' + i + '\', ' + allArr[i][j].hasCity[k].id + ')"><a>' + allArr[i][j].hasCity[k].areaName + ' ×</a></span>';
+                  $('#selectRight').prepend(selected_btn);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 显示已选中的地区按钮
+      if (selectAreaArr.length > 0) {
+        $('#noSelectArea').hide();
+        $('#selectRightContent').show();
+
+        // 显示 展开按钮和收起按钮
+        this.listen_show_hide_btn();
+      } else {
+        $('#selectRightContent').hide();
+        $('#noSelectArea').show();
+      }
+
+    }
+  },
+  in_array: function (needle, haystack) {
+    if (typeof needle == 'string' || typeof needle == 'number') {
+      for (var i in haystack) {
+        if (haystack[i] == needle) {
+          return true;
+        }
+      }
+    }
+    return false;
+  },
+  get_prov_arr: function (mainArea, index) {
+    var provAreaArr = [];
+    provAreaArr = allArr[mainArea];
+    for (var i in provAreaArr) {
+      if (index == provAreaArr[i].id) {
+        return provAreaArr[i].hasCity;
+      }
+    }
+  },
+  // 展开所有省份 下拉 城市菜单
+  show_city_area: function (e, countryArea, id) {
+    var selected_prov, selected_city, _left;
+    var cityArr = this.get_prov_arr(countryArea, id);
+    _left = $(e).offset().left > 500 ? -230 : 0;
+    var _city_div =
+      '<div class="prov-sub-city"><span class="province-item">' +
+      '<span class="display-btn minus" onclick="selectAreaObj.hide_city_area()"></span><label><input type="checkbox" id="checkbox-' + id + '" name="area" data-area="' + countryArea + '" data-areaname="' + cityArr[0].areaName + '" onclick="selectAreaObj.check_prov_area(' + id + ')" value="' + id + '"><a>' + cityArr[0].areaName + '</a></label>' +
+      '</span></div>' +
+      '<div id="allSubCity" class="all-sub-city"></div>';
+    $('#subCityArea').html(_city_div).show().css({
+      top: $(e).offset().top - 3,
+      left: $(e).offset().left - 6
+    }).hover(function () {
+      $(this).show()
+    }, function () {
+      $(this).hide()
+    });
+    $('#allSubCity').css({left: _left});
+    if ($('#checkbox-qg')[0].checked) {
+      // 点击展开省下拉菜单时，如果地区选中，则省选中；如果地区未选中，判断selectAreaArr中是否存在该省的id
+      $('#checkbox-' + id)[0].checked = true;
+      $('#checkbox-' + id)[0].disabled = true;
+
+      var _city_name = '';
+      for (var i = 1; i < cityArr.length; i++) {
+        _city_name = '<span class="city-name"><label id="' + cityArr[i].id + '"><input type="checkbox" name="area" data-provid="' + cityArr[0].id + '" data-area="' + countryArea + '" data-areaname="' + cityArr[i].areaName + '" id="checkbox-' + cityArr[i].id + '" onclick="selectAreaObj.check_city_area(' + cityArr[i].id + ')" value="' + cityArr[i].id + '"><a>' + cityArr[i].areaName + '</a></label></span>';
+        $('#allSubCity').append(_city_name);
+
+        // 如果展开时，省选中了，该省下面的市选中,但是在selectAllarr中删除
+        this.del(countryArea, cityArr[i].id);
+
+        $('#checkbox-' + cityArr[i].id)[0].checked = true;
+        $('#checkbox-' + cityArr[i].id)[0].disabled = true;
+
+      }
+      $('#checkbox-' + countryArea)[0].checked = true;
+      $('#checkbox-' + countryArea)[0].disabled = true;
+    } else {
+      if ($('#checkbox-' + countryArea)[0].checked) {
+        // 点击展开省下拉菜单时，如果地区选中，则省选中；如果地区未选中，判断selectAreaArr中是否存在该省的id
+        $('#checkbox-' + id)[0].checked = true;
+
+        var _city_name = '';
+        for (var i = 1; i < cityArr.length; i++) {
+          _city_name = '<span class="city-name"><label id="' + cityArr[i].id + '"><input type="checkbox" name="area" data-provid="' + cityArr[0].id + '" data-area="' + countryArea + '" data-areaname="' + cityArr[i].areaName + '" id="checkbox-' + cityArr[i].id + '" onclick="selectAreaObj.check_city_area(' + cityArr[i].id + ')" value="' + cityArr[i].id + '"><a>' + cityArr[i].areaName + '</a></label></span>';
+          $('#allSubCity').append(_city_name);
+
+          // 如果展开时，省选中了，该省下面的市选中,但是在selectAllarr中删除
+          this.del(countryArea, cityArr[i].id);
+
+          $('#checkbox-' + cityArr[i].id)[0].checked = true;
+          $('#checkbox-' + cityArr[i].id)[0].disabled = true;
+
+        }
+        $('#checkbox-' + countryArea)[0].checked = true;
+
+      } else {
+        selected_prov = this.in_array(id, selectAreaArr) ? true : false;
+        $('#checkbox-' + id)[0].checked = selected_prov;
+        var _city_name = '';
+        for (var i = 1; i < cityArr.length; i++) {
+          _city_name = '<span class="city-name"><label id="' + cityArr[i].id + '"><input type="checkbox" name="area" data-provid="' + cityArr[0].id + '" data-area="' + countryArea + '" data-areaname="' + cityArr[i].areaName + '" id="checkbox-' + cityArr[i].id + '" onclick="selectAreaObj.check_city_area(' + cityArr[i].id + ')" value="' + cityArr[i].id + '"><a>' + cityArr[i].areaName + '</a></label></span>';
+          $('#allSubCity').append(_city_name);
+          if (selected_prov) {
+            // 如果展开时，省选中了，该省下面的市选中,但是在selectAllarr中删除
+            this.del(countryArea, cityArr[i].id);
+            $('#checkbox-' + cityArr[i].id)[0].checked = true;
+            $('#checkbox-' + cityArr[i].id)[0].disabled = true;
+          } else {
+            selected_city = this.in_array(cityArr[i].id, selectAreaArr) ? true : false;
+            $('#checkbox-' + cityArr[i].id)[0].checked = selected_city;
+          }
+        }
+      }
+    }
+
+  },
+  hide_city_area: function () {
+    $("#subCityArea").hide();
+  },
+  // 点击地区，如：华北、全国、华中等
+  check_coun_area: function (area) {
+
+    if (area != 'qg') {
+
+      if ($('#checkbox-' + area)[0].checked) {
+        // 当点击地区（不是全国），如：华北、华中等为选中时
+        for (var i in allArr[area]) {
+          if (!this.in_array(allArr[area][i].id, selectAreaArr)) {
+            selectAreaArr.push(allArr[area][i].id);
+            if (typeof $('#checkbox-' + allArr[area][i].id)[0] != 'undefined') {
+              $('#checkbox-' + allArr[area][i].id)[0].checked = true;
+            }
+            for (var k = 1; k < allArr[area][i].hasCity.length; k++) {
+              if (this.in_array(allArr[area][i].hasCity[k].id, selectAreaArr)) {
+                // 如果展开时，省选中了，该省下面的市取消选中
+                //$('#checkbox-'+allArr[area][i].hasCity[k].id)[0].checked = false;
+                this.del(area, allArr[area][i].hasCity[k].id);
+              }
+            }
+            var selected_btn = '<span class="select-button select-btn-' + allArr[area][i].id + '" data-area="' + area + '" onclick="selectAreaObj.del(\'' + area + '\', ' + allArr[area][i].id + ')"><a>' + allArr[area][i].areaName + ' ×</a></span>';
+            $('#selectRight').prepend(selected_btn);
+          }
+        }
+
+        $('#checkbox-' + area)[0].checked = true
+
+      } else {
+        // $('#checkbox-'+area)[0].checked=true;
+        // 当点击地区，如：华北、全国、华中等为取消时
+        for (var i in allArr[area]) {
+          if (this.in_array(allArr[area][i].id, selectAreaArr)) {
+            //$('#checkbox-'+allArr[area][i].id)[0].checked = false;
+
+            // 地区所在的省在DIV#selectRight中全部删除显示状态
+            $('#selectRight .select-btn-' + allArr[area][i].id).remove();
+            // 地区所在的省全部删除
+            for (var j in selectAreaArr) {
+              if (selectAreaArr[j] == allArr[area][i].id) {
+                selectAreaArr.splice(j, 1);
+              }
+            }
+            if (typeof $('#checkbox-' + allArr[area][i].id)[0] != 'undefined') {
+              $('#checkbox-' + allArr[area][i].id)[0].checked = false;
+              for (var k = 1; k < allArr[area][i].hasCity.length; k++) {
+                if (this.in_array(allArr[area][i].hasCity[k].id, selectAreaArr)) {
+                  // 如果展开时，省选中了，该省下面的市取消选中
+                  $('#checkbox-' + allArr[area][i].hasCity[k].id)[0].checked = false;
+                  this.del(area, allArr[area][i].hasCity[k].id);
+                }
+              }
+            }
+            for (var k = 1; k < allArr[area][i].hasCity.length; k++) {
+              if (this.in_array(allArr[area][i].hasCity[k].id, selectAreaArr)) {
+                // 如果展开时，省选中了，该省下面的市取消选中
+                //$('#checkbox-'+allArr[area][i].hasCity[k].id)[0].checked = false;
+                this.del(area, allArr[area][i].hasCity[k].id);
+              }
+            }
+          }
+        }
+      }
+      // 判断地区是否全部选中
+      this.listen_counarea_num();
+    } else {
+      // 如果点击全国
+      if ($('#checkbox-' + area)[0].checked) {
+        // 当全国为选中状态时
+        this.qg_check_true();
+      } else {
+        // 当全国是取消选中状态时
+        this.reset_area();
+      }
+    }
+    if (selectAreaArr.length > 0) {
+      $('#noSelectArea').hide();
+      $('#selectRightContent').show();
+
+      // 显示 展开按钮和收起按钮
+      this.listen_show_hide_btn();
+    } else {
+      $('#selectRightContent').hide();
+      $('#noSelectArea').show();
+    }
+  },
+  // 点击全国、地区、省、市等复选框时，监听'展开'按钮和'收起'按钮的显示
+  listen_show_hide_btn: function () {
+    //console.log('#selectRight.width='+$('#selectRight').width()+' ;#selectRight.height='+$('#selectRight').height());
+    if ($('#selectRight').width() > 560 || $('#selectRight').height() > 27) {
+      $('#show-more-area-content').show();
+    } else {
+      $('#show-more-area-content').hide();
+      $('#selectRightContent .select-right').css({'height': '27', 'overflow': 'hidden'});
+      $('#show-more-area-content .hide-button').hide();
+      $('#show-more-area-content .ellipsis-icon').css('display', 'inline-block');
+      $('#show-more-area-content .open-button').css('display', 'inline-block');
+    }
+  },
+  show_more_area_btn: function () {
+    $('#selectRightContent .select-right').css({'height': '64', 'overflow-y': 'scroll'});
+    $('#show-more-area-content .ellipsis-icon').hide();
+    $('#show-more-area-content .open-button').hide();
+    $('#show-more-area-content .hide-button').css('display', 'inline-block');
+  },
+  hide_more_area_btn: function () {
+    $('#selectRightContent .select-right').css({'height': '27', 'overflow': 'hidden'});
+    $('#show-more-area-content .hide-button').hide();
+    $('#show-more-area-content .ellipsis-icon').css('display', 'inline-block');
+    $('#show-more-area-content .open-button').css('display', 'inline-block');
+  },
+  qg_check_true: function () {
+    selectAreaArr.push(2703);
+    var selected_btn = '<span class="select-button select-btn-' + allArr['qg'][0].id + '" onclick="selectAreaObj.reset_area()"><a>全国 ×</a></span>';
+    $('#selectRight').prepend(selected_btn);
+    for (var i in allArr) {
+      // 此时area = qg
+      if (i != 'qg') {
+        // 1.全国下面的地区全选中
+        $('#checkbox-' + i)[0].checked = true;
+        $('#checkbox-' + i)[0].disabled = true;
+        for (var j in allArr[i]) {
+          if (!this.in_array(allArr[i][j].id, selectAreaArr)) {
+            //selectAreaArr.push(allArr[i][j].id);
+            if (typeof $('#checkbox-' + allArr[i][j].id)[0] != 'undefined') {
+              // 地区对应的所有省选中
+              $('#checkbox-' + allArr[i][j].id)[0].checked = true;
+              $('#checkbox-' + allArr[i][j].id)[0].disabled = true;
+            }
+            for (var k = 1; k < allArr[i][j].hasCity.length; k++) {
+              if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+                // 如果展开时，省选中了，该省下面的市取消选中
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].checked = true;
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].disabled = true;
+                this.del(i, allArr[i][j].hasCity[k].id);
+              }
+            }
+            /*var selected_btn = '<span class="select-button select-btn-'+allArr[i][j].id+'" onclick="selectAreaObj.del('+allArr[i][j].id+')"><a>'+ allArr[i][j].areaName +' ×</a></span>';
+             $('#selectRight').prepend(selected_btn);*/
+          } else {
+            // 删除已选中数组中的省id
+            this.del(i, allArr[i][j].id);
+            if (typeof $('#checkbox-' + allArr[i][j].id)[0] != 'undefined') {
+              $('#checkbox-' + allArr[i][j].id)[0].checked = true;
+              $('#checkbox-' + allArr[i][j].id)[0].disabled = true;
+            }
+            for (var k = 1; k < allArr[i][j].hasCity.length; k++) {
+              if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+                // 如果展开时，省选中了，该省下面的市取消选中
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].checked = true;
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].disabled = true;
+                this.del(i, allArr[i][j].hasCity[k].id);
+              }
+            }
+          }
+          $('#checkbox-' + i)[0].checked = true;
+          $('#checkbox-' + i)[0].disabled = true;
+        }
+      }
+    }
+  },
+  reset_area: function () {
+    // 点击取消全国或者重置按钮时
+    $('#checkbox-qg')[0].checked = false;
+    $('#checkbox-qg')[0].disabled = false;
+    this.del('qg', allArr['qg'][0].id);
+    for (var i in allArr) {
+      if (i != 'qg') {
+        // 1.全国下面的地区全部取消选中
+        $('#checkbox-' + i)[0].checked = false;
+        $('#checkbox-' + i)[0].disabled = false;
+        for (var j in allArr[i]) {
+          if (!this.in_array(allArr[i][j].id, selectAreaArr)) {
+            //selectAreaArr.push(allArr[i][j].id);
+            if (typeof $('#checkbox-' + allArr[i][j].id)[0] != 'undefined') {
+              // 地区对应的所有省选中
+              $('#checkbox-' + allArr[i][j].id)[0].checked = false;
+              $('#checkbox-' + allArr[i][j].id)[0].disabled = false;
+              for (var k = 1; k < allArr[i][j].hasCity.length; k++) {
+                if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+                  // 如果展开时，省选中了，该省下面的市取消选中
+                  $('#checkbox-' + allArr[i][j].hasCity[k].id)[0].checked = false;
+                  $('#checkbox-' + allArr[i][j].hasCity[k].id)[0].disabled = false;
+                  this.del(i, allArr[i][j].hasCity[k].id);
+                }
+              }
+            }
+            for (var k = 1; k < allArr[i][j].hasCity.length; k++) {
+              if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+                // 如果展开时，省选中了，该省下面的市取消选中
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].checked = false;
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].disabled = false;
+                this.del(i, allArr[i][j].hasCity[k].id);
+              }
+            }
+          } else {
+            // 删除已选中数组中的省id
+            this.del(i, allArr[i][j].id);
+            if (typeof $('#checkbox-' + allArr[i][j].id)[0] != 'undefined') {
+              $('#checkbox-' + allArr[i][j].id)[0].checked = false;
+              $('#checkbox-' + allArr[i][j].id)[0].disabled = false;
+              /*for (var k=1;k<allArr[i][j].hasCity.length;k++) {
+               if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+               // 如果展开时，省选中了，该省下面的市取消选中
+               $('#checkbox-'+allArr[i][j].hasCity[k].id)[0].checked = false;
+               $('#checkbox-'+allArr[i][j].hasCity[k].id)[0].disabled = false;
+               this.del(i, allArr[i][j].hasCity[k].id);
+               }
+               }*/
+
+            }
+            for (var k = 1; k < allArr[i][j].hasCity.length; k++) {
+              if (this.in_array(allArr[i][j].hasCity[k].id, selectAreaArr)) {
+                // 如果展开时，省选中了，该省下面的市取消选中
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].checked = false;
+                //$('#checkbox-'+allArr[i][j].hasCity[k].id)[0].disabled = false;
+                this.del(i, allArr[i][j].hasCity[k].id);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (selectAreaArr.length > 0) {
+      $('#noSelectArea').hide();
+      $('#selectRightContent').show();
+
+      // 显示 展开按钮和收起按钮
+      this.listen_show_hide_btn();
+    } else {
+      $('#selectRightContent').hide();
+      $('#noSelectArea').show();
+    }
+  },
+  // 监听全国是否选中
+  listen_counarea_num: function () {
+    if ($('#checkbox-db')[0].checked == true && $('#checkbox-hz')[0].checked == true && $('#checkbox-hd')[0].checked == true && $('#checkbox-hn')[0].checked == true && $('#checkbox-hb')[0].checked == true && $('#checkbox-xn')[0].checked == true && $('#checkbox-xb')[0].checked == true) {
+      $('#checkbox-qg')[0].checked = true;
+      this.qg_check_true();
+    }
+  },
+  // 监听某地区是否选中
+  listen_prov_num: function (countryArea) {
+    var country_arr = allArr[countryArea];
+    var all_pro_checked_num = 0;
+    if (typeof country_arr != 'undefined') {
+      for (var i = 0; i < country_arr.length; i++) {
+
+        for (var j in selectAreaArr) {
+          if (selectAreaArr[j] == country_arr[i].id) {
+            all_pro_checked_num++;
+          }
+        }
+      }
+      if (all_pro_checked_num == country_arr.length) {
+        // 如果该地区下的省全部都选了，就选中该地区
+        $('#checkbox-' + countryArea)[0].checked = true;
+        // 判断地区是否全部选中
+        this.listen_counarea_num();
+      } else {
+        $('#checkbox-' + countryArea)[0].checked = false;
+      }
+    }
+  },
+  // 点击省份
+  check_prov_area: function (id) {
+    var countryArea = $('#checkbox-' + id).data('area');
+    var cityArr = this.get_prov_arr(countryArea, id);
+    if (!this.in_array(id, selectAreaArr)) {
+      selectAreaArr[selectAreaArr.length] = id;
+      var selected_btn = '<span class="select-button select-btn-' + id + '" data-area="' + countryArea + '" onclick="selectAreaObj.del(\'' + countryArea + '\', ' + id + ')"><a>' + cityArr[0].areaName + ' ×</a></span>';
+      $('#selectRight').prepend(selected_btn);
+      if (typeof cityArr != 'undefined') {
+        for (var i = 1; i < cityArr.length; i++) {
+          // 省级所属的市全部选中
+          $('#checkbox-' + cityArr[i].id)[0].checked = true;
+          $('#checkbox-' + cityArr[i].id)[0].disabled = true;
+          // 省级所属的市在DIV#selectRight中全部删除显示状态
+          $('#selectRight .select-btn-' + cityArr[i].id).remove();
+          // 省级所属的市的id在数组selectAreaArr中全部删除
+          for (var k in selectAreaArr) {
+            if (selectAreaArr[k] == cityArr[i].id) {
+              selectAreaArr.splice(k, 1);
+            }
+          }
+        }
+      }
+      if (selectAreaArr.length > 0) {
+        $('#noSelectArea').hide();
+        $('#selectRightContent').show();
+
+        // 显示 展开按钮和收起按钮
+        this.listen_show_hide_btn();
+      } else {
+        $('#selectRightContent').hide();
+        $('#noSelectArea').show();
+      }
+
+      // 监听地区所在的省是否全选中
+      this.listen_prov_num(countryArea);
+      this.listen_counarea_num();
+
+    } else {
+      this.del(countryArea, id);
+      if (typeof cityArr != 'undefined') {
+        for (var i in cityArr) {
+          // 省级所属的市全部选中
+          $('#checkbox-' + cityArr[i].id)[0].checked = false;
+          $('#checkbox-' + cityArr[i].id)[0].disabled = false;
+          // 省级所属的市在DIV#selectRight中全部删除显示状态
+          $('#selectRight .select-btn-' + cityArr[i].id).remove();
+          // 省级所属的市的id在数组selectAreaArr中全部删除
+          for (var k in selectAreaArr) {
+            if (selectAreaArr[k] == cityArr[i].id) {
+              selectAreaArr.splice(k, 1);
+            }
+          }
+        }
+      }
+      // 监听地区所在的省是否全选中
+      this.listen_prov_num(countryArea);
+    }
+  },
+  // 点击市
+  check_city_area: function (id) {
+    var _prov_id = $('#checkbox-' + id).data('provid');
+    var _prov_area = $('#checkbox-' + id).data('area');
+    var _area_name = $('#checkbox-' + id).data('areaname');
+    var cityArr = this.get_prov_arr(_prov_area, _prov_id);
+
+    if (!this.in_array(id, selectAreaArr)) {
+      $('#checkbox-' + id)[0].checked = true;
+      selectAreaArr[selectAreaArr.length] = id;
+
+      var selected_btn = '<span class="select-button select-btn-' + id + '" data-area="' + _prov_area + '" onclick="selectAreaObj.del(\'' + _prov_area + '\', ' + id + ')"><a>' + _area_name + ' ×</a></span>';
+      $('#selectRight').prepend(selected_btn);
+      if (this.in_array(_prov_id, selectAreaArr)) {
+        // 如果省选中了，则删除省
+        this.del(_prov_area, _prov_id);
+        $('#checkbox-' + _prov_id)[0].checked = false;
+        for (var i = 1; i < cityArr.length; i++) {
+          $('#checkbox-' + cityArr[i].id)[0].checked = false;
+        }
+        $('#checkbox-' + id)[0].checked = true;
+      } else {
+        if ($('#checkbox-' + _prov_id)[0].checked) {
+          $('#checkbox-' + _prov_id)[0].checked = false;
+          for (var i = 1; i < cityArr.length; i++) {
+            $('#checkbox-' + cityArr[i].id)[0].checked = false;
+          }
+          $('#checkbox-' + id)[0].checked = true;
+        }
+      }
+      if (selectAreaArr.length > 0) {
+        $('#noSelectArea').hide();
+        $('#selectRightContent').show();
+        // 显示 展开按钮和收起按钮
+        this.listen_show_hide_btn();
+      } else {
+        $('#selectRightContent').hide();
+        $('#noSelectArea').show();
+      }
+
+
+      var all_city_checked_num = 0;
+      if (typeof cityArr != 'undefined') {
+        for (var i = 1; i < cityArr.length; i++) {
+          // all_city_checked = $('#checkbox-'+cityArr[i].id)[0].checked;
+          //$('#checkbox-'+cityArr[i].id)[0].checked?all_city_checked=true:all_city_checked=false;
+          if (this.in_array(cityArr[i].id, selectAreaArr)) {
+            all_city_checked_num++;
+          }
+        }
+        if (all_city_checked_num == cityArr.length - 1) {
+          // 如果该省下的市全部都选了，删除该省所有的市，保留省
+          selectAreaArr[selectAreaArr.length] = _prov_id;
+          $('#checkbox-' + _prov_id)[0].checked = true;
+          var _prov_text = $('#checkbox-' + _prov_id).next().text();
+          var selected_btn = '<span class="select-button select-btn-' + _prov_id + '" data-area="' + _prov_area + '" onclick="selectAreaObj.del(\'' + _prov_area + '\', ' + _prov_id + ')"><a>' + _prov_text + ' ×</a></span>';
+          $('#selectRight').prepend(selected_btn);
+          for (var i = 1; i < cityArr.length; i++) {
+            this.del(_prov_area, cityArr[i].id);
+            $('#checkbox-' + cityArr[i].id)[0].checked = true;
+            $('#checkbox-' + cityArr[i].id)[0].disabled = true;
+          }
+        }
+      }
+      // 监听地区所在的省是否全选中
+      this.listen_prov_num(_prov_area);
+    } else {
+      this.del(_prov_area, id);
+      $('#checkbox-' + id)[0].checked = false;
+
+      // 监听地区所在的省是否全选中
+      this.listen_prov_num(_prov_area);
+    }
+  },
+  del: function (countryArea, id) {
+    var selected_prov;
+    for (var i in selectAreaArr) {
+      if (selectAreaArr[i] == id) {
+        selectAreaArr.splice(i, 1);
+      }
+    }
+    $('#selectRight .select-btn-' + id).remove();
+    selected_prov = this.in_array(id, selectAreaArr) ? true : false;
+    if (typeof $('#checkbox-' + id)[0] != 'undefined') {
+      $('#checkbox-' + id)[0].checked = selected_prov;
+    }
+
+    // 监听地区所在的省是否全选中
+    this.listen_prov_num(countryArea);
+
+    if (selectAreaArr.length == 0) {
+      $('#selectRightContent').hide();
+      $('#noSelectArea').show();
+    } else {
+      // 显示 展开按钮和收起按钮
+      this.listen_show_hide_btn();
+    }
+  }
+};
+/*** 选择地区fn over ***/
+
+
+/*** 选择项目fn start ***/
+var selectItemArr = []; // 已选中的项目id
+var selectItemObj = {
+  //根据后台返回的项目id，选中相应的项目
+  show_selected_item: function (item) {
+	$('#selectItemRight').html('');
+    if (item == '') {
+      selectItemArr = [];
+    } else {
+      selectItemArr = item.split(",");
+    }
+
+    // 检查是否选中全部项目
+    var all_sup_checked_num = 0;
+    for (var key in allXmType) {
+      for (var j in selectItemArr) {
+        // 检查已选中的所有项目id，与所有父级项目的id对比
+        if (selectItemArr[j] == key) {
+          all_sup_checked_num++;
+        }
+      }
+      if (all_sup_checked_num == 19) {
+        // 如果全部项目都选了，就选中全部
+        $('#checkbox-item-all')[0].checked = true;
+        var selected_btn = '<span class="select-button select-btn-' + key + '" onclick="selectItemObj.del(' + key + ')"><a>' + allXmType[key][0].xmname + ' ×</a></span>';
+        $('#selectItemRight').prepend(selected_btn);
+      } else {
+        $('#checkbox-item-all')[0].checked = false;
+        if (this.in_array(key, selectItemArr)) {
+          if (typeof $('#checkbox-item-' + key)[0] != 'undefined') {
+            $('#checkbox-item-' + key)[0].checked = true;
+          }
+          var selected_btn = '<span class="select-button select-btn-' + key + '" onclick="selectItemObj.del(' + key + ')"><a>' + allXmType[key][0].xmname + ' ×</a></span>';
+          $('#selectItemRight').prepend(selected_btn);
+        } else {
+          for (var k = 0; k < allXmType[key][0].hasChild.length; k++) {
+            if (this.in_array(allXmType[key][0].hasChild[k].id, selectItemArr)) {
+              // 如果展开时，省选中了，该省下面的市取消选中
+              //$('#checkbox-item-'+allXmType[key][0].hasChild[k].id)[0].checked = false;
+              var selected_btn = '<span class="select-button select-btn-' + allXmType[key][0].hasChild[k].id + '" onclick="selectItemObj.del(' + allXmType[key][0].hasChild[k].id + ')"><a>' + allXmType[key][0].hasChild[k].xmname + ' ×</a></span>';
+              $('#selectItemRight').prepend(selected_btn);
+            }
+          }
+        }
+      }
+    }
+    if (selectItemArr.length != 0) {
+      if (selectItemArr.length > 0) {
+        $('#noSelectItem').hide();
+        $('#selectItemRightContent').show();
+        // 监听'展开'按钮和'收起'按钮的显示
+        this.listen_show_hide_btn();
+      } else {
+        $('#selectItemRightContent').hide();
+        $('#noSelectItem').show();
+      }
+    }
+  },
+  in_array: function (needle, haystack) {
+    if (typeof needle == 'string' || typeof needle == 'number') {
+      for (var i in haystack) {
+        if (haystack[i] == needle) {
+          return true;
+        }
+      }
+    }
+    return false;
+  },
+  // 展开所有项目 下拉菜单
+  show_sub_item: function (e, id) {
+    var subItemArr = allXmType[id][0], selected_sub_item, _left, selected_sup_item;
+    _left = $(e).offset().left > 500 ? -211 : 0;
+    var _sub_item_div =
+      '<div class="sup-item-name-content"><span class="province-item">' +
+      '<span class="display-btn minus" onclick="selectItemObj.hide_sub_item()"></span><label><input type="checkbox" id="checkbox-item-' + id + '" name="leixing" data-supname="' + subItemArr.xmname + '" data-supid="' + id + '" onclick="selectItemObj.check_sup_item(' + id + ')" value="' + id + '"><a>' + subItemArr.xmname + '</a></label>' +
+      '</span></div>' +
+      '<div id="allSubItems" class="all-sub-items-content"></div>';
+    $('#subItemCont').html(_sub_item_div).show().css({
+      top: $(e).offset().top - 3,
+      left: $(e).offset().left - 6
+    }).hover(function () {
+      $(this).show()
+    }, function () {
+      $(this).hide()
+    });
+    $('#allSubItems').css({left: _left});
+    if ($('#checkbox-item-all')[0].checked) {
+      // 点击展开省下拉菜单时，如果地区选中，则省选中；如果地区未选中，判断selectItemArr中是否存在该省的id
+      $('#checkbox-item-' + id)[0].checked = true;
+      // $('#checkbox-item-'+id)[0].disabled = true;
+    } else {
+      selected_sup_item = this.in_array(id, selectItemArr) ? true : false;
+      $('#checkbox-item-' + id)[0].checked = selected_sup_item;
+    }
+    var _sub_item_name = '';
+    for (var i = 0; i < subItemArr.hasChild.length; i++) {
+      _sub_item_name = '<span class="sub-item-name"><label id="' + subItemArr.hasChild[i].id + '"><input type="checkbox" name="leixing" data-subid="' + id + '" data-supname="' + subItemArr.xmname + '" data-subname="' + subItemArr.hasChild[i].xmname + '" id="checkbox-item-' + subItemArr.hasChild[i].id + '" onclick="selectItemObj.check_sub_item(' + subItemArr.hasChild[i].id + ')" value="' + subItemArr.hasChild[i].id + '"><a>' + subItemArr.hasChild[i].xmname + '</a></label></span>';
+      $('#allSubItems').append(_sub_item_name);
+      if ($('#checkbox-item-' + id)[0].checked) {
+        // 如果展开时，父级项目选中了，该父级项目下面的子级项目选中,但是在selectItemArr中删除
+        this.del(subItemArr.hasChild[i].id);
+        $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].checked = true;
+        $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].disabled = true;
+      } else {
+        selected_sub_item = this.in_array(subItemArr.hasChild[i].id, selectItemArr) ? true : false;
+        $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].checked = selected_sub_item;
+      }
+    }
+  },
+  hide_sub_item: function () {
+    $("#subItemCont").hide();
+  },
+  // 监听父级项目是否选中
+  listen_sup_num: function () {
+
+    // var subItemArr = allXmType[id][0];
+    var all_sup_checked_num = 0;
+    for (var key in allXmType) {
+      for (var j in selectItemArr) {
+        // 检查已选中的所有项目id，与所有父级项目的id对比
+        if (selectItemArr[j] == key) {
+          all_sup_checked_num++;
+        }
+      }
+      if (all_sup_checked_num == 19) {
+        // 如果全部项目都选了，就选中全部
+        $('#checkbox-item-all')[0].checked = true;
+        if (!this.in_array(key, selectItemArr)) {
+          var selected_btn = '<span class="select-button select-btn-' + key + '" onclick="selectItemObj.del(' + key + ')"><a>' + allXmType[key][0].xmname + ' ×</a></span>';
+          $('#selectItemRight').prepend(selected_btn);
+        }
+      } else {
+        $('#checkbox-item-all')[0].checked = false;
+      }
+    }
+  },
+  // 点击全部、父级项目、子级项目等复选框时，监听'展开'按钮和'收起'按钮的显示
+  listen_show_hide_btn: function () {
+    //console.log('#selectItemRight.width='+$('#selectItemRight').width()+' ;#selectItemRight.height='+$('#selectItemRight').height());
+    if ($('#selectItemRight').width() > 560 || $('#selectItemRight').height() > 27) {
+      $('#show-more-item-content').show();
+    } else {
+      $('#show-more-item-content').hide();
+      $('#selectItemRightContent .select-right').css({'height': '27', 'overflow': 'hidden'});
+      $('#show-more-item-content .hide-button').hide();
+      $('#show-more-item-content .ellipsis-icon').css('display', 'inline-block');
+      $('#show-more-item-content .open-button').css('display', 'inline-block');
+    }
+  },
+  show_more_item_btn: function () {
+    $('#selectItemRightContent .select-right').css({'height': '64', 'overflow-y': 'scroll'});
+    $('#show-more-item-content .ellipsis-icon').hide();
+    $('#show-more-item-content .open-button').hide();
+    $('#show-more-item-content .hide-button').css('display', 'inline-block');
+  },
+  hide_more_item_btn: function () {
+    $('#selectItemRightContent .select-right').css({'height': '27', 'overflow': 'hidden'});
+    $('#show-more-item-content .hide-button').hide();
+    $('#show-more-item-content .ellipsis-icon').css('display', 'inline-block');
+    $('#show-more-item-content .open-button').css('display', 'inline-block');
+  },
+  // 点击全部
+  check_all_item: function () {
+    if ($('#checkbox-item-all')[0].checked) {
+
+      $('#checkbox-item-all')[0].checked = true;
+
+      for (var key in allXmType) {
+        if (!this.in_array(key, selectItemArr)) {
+          selectItemArr.push(key);
+          if (typeof $('#checkbox-item-' + key)[0] != 'undefined') {
+            $('#checkbox-item-' + key)[0].checked = true;
+            /*for (var k=0;k<allXmType[key][0].hasChild.length;k++) {
+             if (this.in_array(allXmType[key][0].hasChild[k].id, selectItemArr)) {
+             // 如果展开时，省选中了，该省下面的市取消选中
+             $('#checkbox-item-'+allXmType[key][0].hasChild[k].id)[0].checked = false;
+             this.del(allXmType[key][0].hasChild[k].id);
+             }
+             }*/
+
+          }
+          for (var k = 0; k < allXmType[key][0].hasChild.length; k++) {
+            if (this.in_array(allXmType[key][0].hasChild[k].id, selectItemArr)) {
+              // 如果展开时，省选中了，该省下面的市取消选中
+              //$('#checkbox-item-'+allXmType[key][0].hasChild[k].id)[0].checked = false;
+              this.del(allXmType[key][0].hasChild[k].id);
+            }
+          }
+          var selected_btn = '<span class="select-button select-btn-' + key + '" onclick="selectItemObj.del(' + key + ')"><a>' + allXmType[key][0].xmname + ' ×</a></span>';
+          $('#selectItemRight').prepend(selected_btn);
+
+        }
+      }
+      this.listen_sup_num();
+    } else {
+      // 取消全部
+      this.reset_all_item();
+    }
+    if (selectItemArr.length > 0) {
+      $('#noSelectItem').hide();
+      $('#selectItemRightContent').show();
+
+      // 监听'展开'按钮和'收起'按钮的显示
+      this.listen_show_hide_btn();
+
+
+    } else {
+      $('#selectItemRightContent').hide();
+      $('#noSelectItem').show();
+    }
+  },
+  // 点击重置按钮或取消全部
+  reset_all_item: function () {
+    $('#checkbox-item-all')[0].checked = false;
+    $('#checkbox-item-all')[0].disabled = false;
+    for (var key in allXmType) {
+      if (this.in_array(key, selectItemArr)) {
+        //$('#checkbox-item-'+allArr[area][i].id)[0].checked = false;
+
+        // 地区所在的省在DIV#selectRight中全部删除显示状态
+        $('#selectItemRight .select-btn-' + key).remove();
+        // 地区所在的省全部删除
+        for (var j in selectItemArr) {
+          if (selectItemArr[j] == key) {
+            selectItemArr.splice(j, 1);
+          }
+        }
+      }
+
+      if (typeof $('#checkbox-item-' + key)[0] != 'undefined') {
+        $('#checkbox-item-' + key)[0].checked = false;
+        /*for (var k=0;k<allXmType[key][0].hasChild.length;k++) {
+         if (this.in_array(allXmType[key][0].hasChild[k].id, selectItemArr)) {
+         // 如果展开时，省选中了，该省下面的市取消选中
+         $('#checkbox-item-'+allXmType[key][0].hasChild[k].id)[0].checked = false;
+         this.del(allXmType[key][0].hasChild[k].id);
+         }
+         }*/
+      }
+      for (var k = 0; k < allXmType[key][0].hasChild.length; k++) {
+        if (this.in_array(allXmType[key][0].hasChild[k].id, selectItemArr)) {
+          // 如果展开时，省选中了，该省下面的市取消选中
+          //$('#checkbox-item-'+allXmType[key][0].hasChild[k].id)[0].checked = false;
+          this.del(allXmType[key][0].hasChild[k].id);
+        }
+      }
+
+    }
+
+    if (selectItemArr.length > 0) {
+      $('#noSelectItem').hide();
+      $('#selectItemRightContent').show();
+
+      // 监听'展开'按钮和'收起'按钮的显示
+      this.listen_show_hide_btn();
+    } else {
+      $('#selectItemRightContent').hide();
+      $('#noSelectItem').show();
+    }
+  },
+  // 点击父级项目
+  check_sup_item: function (id) {
+    var _sup_item_name = $('#checkbox-item-' + id).data('supname');
+    //var cityArr = this.get_prov_arr(countryArea, id);
+    var subItemArr = allXmType[id][0];
+    if (!this.in_array(id, selectItemArr)) {
+      selectItemArr[selectItemArr.length] = id;
+      var selected_btn = '<span class="select-button select-btn-' + id + '" onclick="selectItemObj.del(' + id + ')"><a>' + _sup_item_name + ' ×</a></span>';
+      $('#selectItemRight').prepend(selected_btn);
+
+      for (var i = 0; i < subItemArr.hasChild.length; i++) {
+        // 省级所属的市全部选中
+        $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].checked = true;
+        $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].disabled = true;
+        // 省级所属的市在DIV#selectRight中全部删除显示状态
+        $('#selectItemRight .select-btn-' + subItemArr.hasChild[i].id).remove();
+        // 省级所属的市的id在数组selectItemArr中全部删除
+        for (var k in selectItemArr) {
+          if (selectItemArr[k] == subItemArr.hasChild[i].id) {
+            selectItemArr.splice(k, 1);
+          }
+        }
+      }
+
+      if (selectItemArr.length > 0) {
+        $('#noSelectItem').hide();
+        $('#selectItemRightContent').show();
+
+        // 监听'展开'按钮和'收起'按钮的显示
+        this.listen_show_hide_btn();
+      } else {
+        $('#selectItemRightContent').hide();
+        $('#noSelectItem').show();
+      }
+
+      // 监听地区所在的省是否全选中
+      this.listen_sup_num();
+      //this.listen_counarea_num();
+
+    } else {
+      this.del(id);
+      if (typeof subItemArr != 'undefined') {
+        for (var i in subItemArr.hasChild) {
+          $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].checked = false;
+          $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].disabled = false;
+          $('#selectItemRight .select-btn-' + subItemArr.hasChild[i].id).remove();
+          for (var k in selectItemArr) {
+            if (selectItemArr[k] == subItemArr.hasChild[i].id) {
+              selectItemArr.splice(k, 1);
+            }
+          }
+        }
+      }
+      // 监听地区所在的省是否全选中
+      this.listen_sup_num();
+    }
+
+  },
+  // 点击项目的子项目
+  check_sub_item: function (id) {
+    var $checkbox = $('#checkbox-item-' + id);
+    var _sub_item_id = $checkbox.data('subid');
+    var _sub_item_name = $checkbox.data('subname');
+    var _sup_item_name = $checkbox.data('supname'); // 父级项目的名字
+    var subItemArr = allXmType[_sub_item_id][0];
+
+    if (!this.in_array(id, selectItemArr)) {
+      $checkbox[0].checked = true;
+      selectItemArr[selectItemArr.length] = id;
+
+      var selected_btn = '<span class="select-button select-btn-' + id + '" onclick="selectItemObj.del(' + id + ')"><a>' + _sub_item_name + ' ×</a></span>';
+      $('#selectItemRight').prepend(selected_btn);
+      if (this.in_array(_sub_item_id, selectItemArr)) {
+        // 如果父级项目选中了，则删除父级项目
+        this.del(_sub_item_id);
+        $('#checkbox-item-' + _sub_item_id)[0].checked = false;
+        for (var i = 0; i < subItemArr.hasChild.length; i++) {
+          $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].checked = false;
+        }
+        $checkbox[0].checked = true;
+      } else {
+        if ($('#checkbox-item-' + _sub_item_id)[0].checked) {
+          $('#checkbox-item-' + _sub_item_id)[0].checked = false;
+          for (var i = 0; i < subItemArr.hasChild.length; i++) {
+            $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].checked = false;
+          }
+          $checkbox[0].checked = true;
+        }
+      }
+      if (selectItemArr.length > 0) {
+        $('#noSelectItem').hide();
+        $('#selectItemRightContent').show();
+
+        // 监听'展开'按钮和'收起'按钮的显示
+        this.listen_show_hide_btn();
+      } else {
+        $('#selectItemRightContent').hide();
+        $('#noSelectItem').show();
+      }
+
+
+      var all_subitem_checked_num = 0;
+
+      for (var i = 0; i < subItemArr.hasChild.length; i++) {
+        // all_city_checked = $('#checkbox-item-'+subItemArr.hasChild[i].id)[0].checked;
+        //$('#checkbox-item-'+subItemArr.hasChild[i].id)[0].checked?all_city_checked=true:all_city_checked=false;
+        if (this.in_array(subItemArr.hasChild[i].id, selectItemArr)) {
+          all_subitem_checked_num++;
+        }
+      }
+      if (all_subitem_checked_num == subItemArr.hasChild.length) {
+        // 如果该项父级目下的子项目全部都选了，删除该项目所有的子项目，保留该父级项目
+        selectItemArr[selectItemArr.length] = _sub_item_id;
+        $('#checkbox-item-' + _sub_item_id)[0].checked = true;
+        // var _prov_text = $('#checkbox-item-'+_sub_item_id).next().text();
+        var selected_btn = '<span class="select-button select-btn-' + _sub_item_id + '" onclick="selectItemObj.del(' + _sub_item_id + ')"><a>' + _sup_item_name + ' ×</a></span>';
+        $('#selectItemRight').prepend(selected_btn);
+        for (var i = 0; i < subItemArr.hasChild.length; i++) {
+          this.del(subItemArr.hasChild[i].id);
+          $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].checked = true;
+          $('#checkbox-item-' + subItemArr.hasChild[i].id)[0].disabled = true;
+        }
+      }
+
+      // 监听父级项目的子项目是否全选中
+      this.listen_sup_num();
+    } else {
+      this.del(id);
+      $checkbox[0].checked = false;
+
+      // 监听父级项目的子项目是否全选中
+      this.listen_sup_num();
+    }
+  },
+  del: function (id) {
+    var selected_sub;
+    for (var i in selectItemArr) {
+      if (selectItemArr[i] == id) {
+        selectItemArr.splice(i, 1);
+      }
+    }
+    $('#selectItemRight .select-btn-' + id).remove();
+    selected_sub = this.in_array(id, selectItemArr) ? true : false;
+    if (typeof $('#checkbox-item-' + id)[0] != 'undefined') {
+      $('#checkbox-item-' + id)[0].checked = selected_sub;
+    }
+
+    // 监听父级项目的子项目是否全选中
+    this.listen_sup_num();
+
+    if (selectItemArr.length == 0) {
+      $('#selectItemRightContent').hide();
+      $('#noSelectItem').show();
+    } else {
+      // 监听'展开'按钮和'收起'按钮的显示
+      this.listen_show_hide_btn();
+    }
+  }
+};
+/*** 选择项目fn over ***/
+
+

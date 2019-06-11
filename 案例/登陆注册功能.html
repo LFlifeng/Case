@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script type="text/javascript">
+        function People (username,pwd,phonenumber){
+            this.username = username;
+            this.pwd = pwd;
+            this.phonenumber = phonenumber;
+        }
+        //初始化一部分用户登陆信息
+        var zs = new People('zs','123','123223442');
+        var ls = new People('ls','456','32242321');
+        var people_ary = [zs,ls];
+        // 判断用户是否存在
+        function has_people(username){
+            //假设flag = true，当前用户存在，反之不存在
+            var flag = true;
+            for (var i = 0;i < people_ary.length;i++){
+                if(people_ary[i].username === username){
+                    flag = true;
+                    break;
+                } else {
+                    flag = false;
+                }
+            }
+            return flag;
+        }
+        // 判断当前用户是否登陆成功
+        function islogin(username,pwd){
+            // 如果为true，登陆成功,反之失败
+            var flag = true;
+            for (var i= 0;i < people_ary.length;i++){
+                if(people_ary[i].username === username　&& people_ary[i].pwd === pwd){
+                    flag = true;
+                    break;
+                }else {
+                    flag = false;
+                }
+            }
+            return flag;
+        }
+        // 注册功能
+        function isregist (People){
+            // 注册成功
+            var flag = true;
+            if(has_people(People.username)){
+                // 用户存在
+                flag = false;
+            }else {
+                // 用户不存在，可以注册
+                people_ary[people_ary.length] = People;
+                flag= true;
+            }
+            return flag;
+        }
+        // 开始执行程序 匿名函数自调用
+        (function (){
+            var username = prompt("请输入用户名");
+            var pwd = prompt("请输入密码");
+            if(has_people(username)){
+                //用户存在，判断是否登陆成功
+                if(islogin(username,pwd)){
+                    alert('恭喜，登陆成功！');
+                }else {
+                    alert('用户名或密码错误，登陆失败');
+                }
+            }else {
+                // 用户不存在，提示用户是否要注册
+                if(confirm('您输入的用户名不存在，是否要注册？？？')){
+                    // 注册，用户填写信息
+                    var username = prompt('请输入用户名');
+                    var pwd = prompt("请输入登陆密码");
+                    var phonenumber = prompt("请输入联系电话");
+                    var p1 = new People(username,pwd,phonenumber);
+                    // 判断当前对象是否已存在
+                    if(isregist(p1)){
+                        // 注册成功
+                        alert('恭喜注册成功，可以直接登陆使用');
+                        console.log(people_ary);
+                    }else {
+                        //不注册
+                        alert('不注册，那你走吧...');
+                    }
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

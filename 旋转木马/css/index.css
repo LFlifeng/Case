@@ -1,0 +1,39 @@
+.slide .slide1 {
+    width: 400px;
+    top: 20px;
+    left: 50px;
+    opacity: 0.2;
+    z-index: 2;
+  }
+
+  .slide .slide2 {
+    width: 600px;
+    top: 70px;
+    left: 0;
+    opacity: 0.8;
+    z-index: 3;
+  }
+
+  .slide .slide3 {
+    width: 800px;
+    top: 100px;
+    left: 200px;
+    opacity: 1;
+    z-index: 4;
+  }
+
+  .slide .slide4 {
+    width: 600px;
+    top: 70px;
+    left: 600px;
+    opacity: 0.8;
+    z-index: 3;
+  }
+
+  .slide .slide5 {
+    width: 400px;
+    top: 20px;
+    left: 750px;
+    opacity: .2;
+    z-index: 2;
+  }

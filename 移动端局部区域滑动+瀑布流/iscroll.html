@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="format-detection"content="telephone=no, email=no" />
+<meta name="misapplication-tap-highlight" content="no"/>
+<meta name="HandheldFriendly" content="true"/>
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<meta name="msapplication-tap-highlight" content="no" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="tc.css">
+<link rel="stylesheet" type="text/css" href="scrollbar.css">
+<style>
+
+</style>
+</head>
+<body>
+<!--分配获奖号码-->
+<div class="tcbox" >
+    <div class="tcmain">
+        <div class="tc_close"></div>
+        <div class="tc-content01">
+            <div class="top-wrap">
+                <p>您成功参与了<strong>第<span>20151225001</span>期</strong>夺宝，参与<span class="col-org">10</span>人次。</p>
+                <p>您成功参与了<strong>第<span>20151225002</span>期</strong>夺宝，参与<span class="col-org">10</span>人次。</p>
+            </div>
+            <p class="wish">您获得了<span class="col-org">20</span>个幸运号码，祝您夺宝成功！</p>
+            <div id="tc-wrapper1">
+                <dl class="num-list">
+                    <dt>第20151225001期</dt>
+                    <dd><span>10002351</span>，<span>10001384</span>，<span>10006354</span>，<span>10002634</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span></dd>
+                    <dt>第20151225002期</dt>
+                    <dd><span>10002351</span>，<span>10001384</span>，<span>10006354</span>，<span>10002634</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span></dd>
+                </dl>
+            </div>
+            <div class="bottom-wrap">
+                <a href="javascript:;" class="tc-button" style="display:none">填写领奖地址</a>
+                <a href="javascript:;" class="tc-button">确&nbsp;定</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--我的夺宝号码-->
+<div class="tcbox" style="display:none;">
+    <div class="tcmain">
+        <div class="tc_close"></div>
+        <div class="tc-content02">
+            <p class="mynum">我的夺宝号码</p>
+            <div id="tc-wrapper2">
+                <dl class="num-list">
+                    <dd><span>10002351</span>，<span>10001384</span>，<span>10006354</span>，<span>10002634</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001384</span>，<span>10006354</span>，<span>10002634</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001384</span>，<span>10006354</span>，<span>10002634</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001384</span>，<span>10001384</span>，<span>10006354</span>，<span>10002634</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001384</span>，<span>10001384</span>，<span>10006354</span>，<span>10002634</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span>，<span>10001524</span>，<span>10002351</span>，<span>10001384</span></dd>
+                </dl>
+            </div>
+            <div class="bottom-wrap">
+                <a href="javascript:;" class="tc-button">确&nbsp;定</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--我想参与人次-->
+<div class="tcbox" style="display:none;">
+    <div class="tcmain">
+        <div class="tc_close"></div>
+        <div class="tc-content03">
+            <p class="buytext">我想参与人次</p>
+                <div class="w-number-wrap">            
+                    <div class="w-number">
+                        <input class="w-number-input" value="10">
+                        <a class="w-number-btn w-number-btn-plus " data-pro="plus" href="javascript:void(0);">+</a>
+                        <a class="w-number-btn w-number-btn-minus w-number-btn-disabled" data-pro="minus" href="javascript:void(0);">-</a>
+                    </div>
+                    <span class="m-detail-main-buyHint">
+                                    <i class="ico-arrow"></i>
+                                    <b>获奖概率<span>0.026％</span></b>
+                                    <b style="display:none;">加大参与人次，夺宝在望！</b>
+                    </span>
+                </div>
+            <div class="bottom-wrap">
+                <a href="javascript:;" class="tc-button">确&nbsp;定</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="iScroll.js"></script> 
+<script type="text/javascript">
+
+var myScroll1,myScroll2;
+function loaded() {
+    myScroll1 = new iScroll('tc-wrapper1', {
+                scrollbarClass: 'myScrollbar' ,
+                hScrollbar:false,
+                vScroll:true,
+                hideScrollbar: false //是否隐藏滚动条  
+            });
+    myScroll2 = new iScroll('tc-wrapper2', {
+                scrollbarClass: 'myScrollbar' ,
+                hScrollbar:false,
+                vScroll:true,
+                hideScrollbar: false //是否隐藏滚动条  
+            });
+}
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+document.addEventListener('DOMContentLoaded', loaded, false);
+/*显示弹层层调用show方法时重新调用new iScroll()*/
+</script>
+</body>
+</html>
