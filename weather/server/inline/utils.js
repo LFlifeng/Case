@@ -16,7 +16,7 @@ const KEY = '_weather'   //和风天气中应用的key名称
 const USER_ID = '	HE1908201013021293' //和风天气中应用的密钥ID
 
 const WECHAT_APPID = 'wxf2ba8ea6f3c75a8d'
-const WECHAT_APP_SECRET = 'gh_795091ab7086'
+const WECHAT_APP_SECRET = '6ddd4860330802b82ef7f3ba5a5301bd'
 const $ = {
   getWechatAppConfig: () => {
     return {

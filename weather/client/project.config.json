@@ -1,5 +1,5 @@
 {
-	"cloudfunctionRoot": "cloud-functions/",
+	"cloudfunctionRoot": "./cloud-functions/",
 	"appid": "wxf2ba8ea6f3c75a8d",
 	"setting": {},
 	"projectname": "weather",
