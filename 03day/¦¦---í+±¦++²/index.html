@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>城市选择</title>
+
+    <style>
+        select {
+            width: 100px;
+            height: 200px;
+        }
+
+        select,div {
+            float: left;
+        }
+
+        div {
+            width: 100px;
+            text-align: center;
+        }
+
+        div button {
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <select id="selLeft" multiple>
+        <option value="">北京</option>
+        <option value="">上海</option>
+        <option value="">深圳</option>
+        <option value="">广州</option>
+        <option value="">杭州</option>
+        <option value="">青岛</option>
+    </select>
+    <div>
+        <button id="toRight">&gt;</button><br>
+        <button id="toLeft">&lt;</button><br>
+        <button id="allToRight">&gt;&gt;</button><br>
+        <button id="allToLeft">&lt;&lt;</button><br>
+
+    </div>
+    <select id='selRight' multiple></select>
+    <script src="./js/vendor/jquery-1.12.4.js"></script>
+    <script src="./js/index.js"></script>
+</body>
+
+</html>

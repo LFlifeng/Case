@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>开关机动画</title>
+    <style>
+      button {
+        opacity: .2;
+        position: absolute;
+        right: 0;
+        bottom: 345px;
+      }
+      button.tmp {
+        display: none;
+      }
+      #top {
+        position: absolute;
+        bottom: 105px;
+        right: 0;
+      }
+      #bottom {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+      #top.active {
+        display: none;
+      }
+      #bottom.active {
+        display: none;
+      }
+    </style>
+</head>
+<body>
+    <button>X</button>
+    <img src="../img/t.jpg" alt="" id="top">
+    <img src="../img/b.jpg" alt="" id="bottom">
+    <script src="./js/vendor/jquery-1.12.4.js"></script>
+    <script src="./js/index.js"></script>
+</body>
+</html>
