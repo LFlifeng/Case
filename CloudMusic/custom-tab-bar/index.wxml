@@ -1,0 +1,25 @@
+<!-- index.html -->
+<!-- 自定义tabbar页面 -->
+<cover-view class="tab-bar">
+    <cover-view class="tab-bar-border"></cover-view><!--tabBal边框样式  -->
+ <!-- 乐库tabbar -->
+   <cover-view class='tab-bar-item' >
+     <cover-image src='../images/library_on.png' hidden='' bindtap='switchTab_index'></cover-image>
+     <cover-image src='../images/library_off.png' hidden='' bindtap='switchTab_index'></cover-image>
+     <cover-view style="color:#505050">乐库</cover-view>
+   </cover-view>
+ 
+ <!-- 播放tabbar -->
+     <cover-view class='tab-bar-item' bindtap='switchTab_playing'>
+     <cover-image src='../images/collect_on.png' hidden=''></cover-image>
+     <cover-image src='../images/collect_off.png' hidden=''></cover-image>
+     <cover-view></cover-view>
+   </cover-view>
+ 
+ <!-- 我的tabbar -->
+     <cover-view class='tab-bar-item' bindtap='switchTab_me'>
+     <cover-image src='../images/me_on.png' hidden=''></cover-image>
+     <cover-image src='../images/me_off.png' hidden=''></cover-image>
+     <cover-view style="color:#505050">我的</cover-view>
+   </cover-view>
+ </cover-view>

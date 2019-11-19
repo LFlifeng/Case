@@ -1,0 +1,12 @@
+<!-- MV -->
+<view class="songsheet_items_allbox newsong_allbox">
+    <text class="songsheet_container_title">MV</text>
+    <view class="songsheet_items_box" hover-class="none" hover-stop-propagation="false">
+        <view wx:for="{{mv}}" wx:key="item" class='songsheet_item_box recommend_mv' data-id="{{item.id}}"
+            bindtap='handlePlayMv'>
+            <image src='{{item.picUrl}}' class="songsheet_container_image"></image>
+            <text class='songsheet_container_text newsong_songname'>{{item.copywriter}}</text>
+            <text class='newsong_artists'>{{item.name}}</text>
+        </view>
+    </view>
+</view>
