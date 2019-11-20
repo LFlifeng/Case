@@ -1,0 +1,17 @@
+/* more/more_sheet/more_sheet.wxss */
+
+@import "../../pages/index/index";
+.songsheet_item_box {
+    width: 50%;
+    padding-top: 10rpx;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.songsheet_container_image {
+    height: 335rpx;
+}
+
+.newsong_artists {
+    padding-left: 20rpx;
+}

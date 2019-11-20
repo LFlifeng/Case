@@ -59,5 +59,13 @@ module.exports = {
     //歌手榜
     getSonger(data) {
         return request('/toplist/artist', data)
-    }
+    },
+    //热门歌单
+    getsongsheet(data) {
+        return request('/top/playlist', data)
+    },
+    //榜单排行
+    getTopList(data) {
+        return request('/top/list', data)//排行榜
+    },
 }

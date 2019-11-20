@@ -408,5 +408,15 @@ Page({
     wx.navigateTo({
       url: '../../more/more_songer/more_songer',
     })
-  }
+  },
+  go_songsheet() {
+    wx.navigateTo({
+      url: '../../more/more_sheet/more_sheet',
+    })
+  },
+  go_toplist() {
+    wx.navigateTo({
+      url: '../../more/more_toplist/more_toplist',
+    })
+  },
 })
