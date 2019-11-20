@@ -56,7 +56,7 @@ page, .body {
 
 .sing-name {
     font-size: 18px;
-    color: #ffffff;
+    color: #fff;
     width: 92%;
     right: 0;
     display: initial;
