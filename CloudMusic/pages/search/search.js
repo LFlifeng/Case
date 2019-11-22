@@ -1,66 +1,44 @@
 // pages/search/search.js
+const API = require('../../API/api');
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    hotSongs: [],//热搜歌曲
+    inputValue: null,//输入框输入的值
+    history: [], //搜索历史存放数组
+    searchsuggest: [], //搜索建议
+    showView: true,//组件的显示与隐藏
+    showsongresult: true,
+    searchresult: [],//搜索结果
+    searchKey: []
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
-
+  onLoad(options) {
+    wx.showLoading({
+      title: '加载中',
+    });
+    this.getHotSongs();
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
+  //热搜歌曲
+  getHotSongs() {
+    API.gethotsongs({
+      type: 'new'
+    }).then(res => {
+      wx.hideLoading();
+      // console.log(res)
+      if (res.code === 200) {
+        this.setData({
+          hotSongs: res.result.hots
+        })
+      }
+    })
   },
+  
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-
-  }
 })

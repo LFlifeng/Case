@@ -8,7 +8,10 @@ Page({
    * 页面的初始数据
    */
   data: {
-    toplist: []
+    toplist0: [],
+    toplist1: [],
+    toplist2: [],
+    toplist3: [],
   },
 
   /**
@@ -28,15 +31,59 @@ Page({
       // console.log(res);
       if (res.code === 200) {
         this.setData({
-          toplist: res.playlist
+          toplist0: res.playlist
         })
       }
-    })
+    });
+    API.getTopList({
+      idx: 1,
+    }).then(res => {
+      wx.hideLoading();
+      if (res.code === 200) {
+        this.setData({
+          toplist1: res.playlist
+        })
+      }
+    });
+    API.getTopList({
+      idx: 2,
+    }).then(res => {
+      wx.hideLoading();
+      if (res.code === 200) {
+        this.setData({
+          toplist2: res.playlist
+        })
+      }
+    });
+    API.getTopList({
+      idx: 3,
+    }).then(res => {
+      wx.hideLoading();
+      if (res.code === 200) {
+        this.setData({
+          toplist3: res.playlist
+        })
+      }
+    });
   },
-  handleSheet(e){
-    var sheetId = e.currentTarget.dataset.id;//获取到event里面的歌曲id赋值给sheetId
+  go_toplist0(){
     wx.navigateTo({
-      url: `./mmore_sheet?id=${sheetId}`,
-    })
-  }
+      url: `../toplist0/toplist0`,
+    });
+  },
+  go_toplist1(){
+    wx.navigateTo({
+      url: `../toplist1/toplist1`,
+    });
+  },
+  go_toplist2(){
+    wx.navigateTo({
+      url: `../toplist2/toplist2`,
+    });
+  },
+  go_toplist3(){
+    wx.navigateTo({
+      url: `../toplist3/toplist3`,
+    });
+  },
 })

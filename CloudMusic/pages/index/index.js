@@ -419,4 +419,10 @@ Page({
       url: '../../more/more_toplist/more_toplist',
     })
   },
+  // 点击跳转搜索页面
+  go_search(){
+    wx.navigateTo({
+      url: '../search/search',
+    })
+  }
 })

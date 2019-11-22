@@ -66,6 +66,18 @@ module.exports = {
     },
     //榜单排行
     getTopList(data) {
-        return request('/top/list', data)//排行榜
+        return request('/top/list', data)
+    },
+    //热搜接口
+    gethotsongs(data){
+        return request('/search/hot', data)
+    },
+    //搜索建议接口
+    searchSuggest(data){
+        return request('/search/suggest', data)
+    },
+    //搜索结果接口
+    searchResult(data){
+        return request('/search', data)
     },
 }

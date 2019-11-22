@@ -43,7 +43,7 @@ Page({
     },
     timeUpdate(e) {
         // console.log(e)
-        var _time = e.detail.duration - e.detail.currentTime;
+        var _time = parseInt((e.detail.currentTime / e.detail.duration) * 100);
         // console.log(_time)
     }
 })

@@ -23,6 +23,7 @@ Page({
   onLoad: function (options) {
     const audioid = options.id;
     this.play(audioid);
+    // this.songWord(audioid)
   },
   play(audioid) {
     var _this = this;
@@ -93,6 +94,20 @@ Page({
         }
       },
     });
+    //获取歌词
+    wx.request({
+      url: API_BASE_URL + '/lyric',
+      data: {
+        id: JSON.parse(audioId)
+      },
+      header: {
+        'content-type': 'json'
+      },
+      success(res) {
+        // success
+        console.log(res)
+      },
+    });
 
   },
   //创建歌曲背景播放实例
@@ -124,7 +139,7 @@ Page({
     //背景音频结束事件
     bgAudioManage.onEnded(() => {
       //调用go_lastSong()函数，即歌曲结束自动播放下一首歌
-      this.go_lastSong();
+      // this.go_lastSong();
     });
     //将hisSongId存入缓存
     wx.setStorageSync('hisSongId', hisSongId);
@@ -155,19 +170,20 @@ Page({
   //   })
   // },
   //暂停/播放歌曲功能
-  handleToggleBGAudio(){
+  handleToggleBGAudio() {
     var bgAudioManage = app.globalData.bgAudioManage;
     // console.log(this.data)
-    var {isPlay} = this.data;
+    var { isPlay } = this.data;
     // console.log({isPlay})
-    if(isPlay){
+    if (isPlay) {
       bgAudioManage.pause();//暂停
-    }else{
+    } else {
       bgAudioManage.play();//播放
     }
     this.setData({
       isPlay: !isPlay
     });
     // console.log(this.data.isPlay)
-  }
+  },
+
 })
