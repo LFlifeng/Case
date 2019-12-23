@@ -1,5 +1,5 @@
 //封装接口api
-const API_BASE_URL = 'http://neteasecloudmusicapi.zhaoboy.com';
+const API_BASE_URL = 'http://localhost:3000';
 var request = (url, data) => {
     var _url = API_BASE_URL + url;
     return new Promise((resolve, reject) => {
