@@ -420,9 +420,13 @@ Page({
     })
   },
   // 点击跳转搜索页面
-  go_search(){
+  go_search() {
     wx.navigateTo({
       url: '../search/search',
     })
   }
-})
+});
+
+
+
+
